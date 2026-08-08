@@ -1,0 +1,32 @@
+﻿<Window x:Class="TekygamiPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TekygamiPlayer"
+        mc:Ignorable="d"
+        Title="TekygamiPlayer" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Button x:Name="BtnSelectFolder" Grid.Row="0" Content="Select Music Folder" Height="30" Margin="0,0,0,10" Click="BtnSelectFolder_Click"/>
+
+        <ListBox x:Name="LbPlayList" Grid.Row="1" Margin="0,0,0,10" Foreground="Black">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="BtnPlay" Content="Play" Width="75" Height="30"  Margin="5"/>
+            <Button x:Name="BtnPause" Content="Pause" Width="75" Height="30" Margin="5"/>
+            <Button x:Name="BtnStop" Content="Stop" Width="75" Height="30" Margin="5"/>
+        </StackPanel>
+    </Grid>
+</Window>

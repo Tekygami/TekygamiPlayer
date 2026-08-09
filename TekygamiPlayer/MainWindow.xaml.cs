@@ -1,14 +1,17 @@
 ﻿using System.Text;
+using System.IO;
+using System.Windows.Media.Imaging;
+using TagLib;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 namespace TekygamiPlayer
+ 
 {
 
     /// <summary>
@@ -127,12 +130,13 @@ namespace TekygamiPlayer
 
         private void LbPlayList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            
             int index = LbPlayList.SelectedIndex;
             if (index >= 0 && index < audioFilePaths.Count)
             {
 
                 selectedFilePath = audioFilePaths[index];
-                
+                LoadAlbumArt(selectedFilePath);
             }
         }
         private void LbPlayList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -166,6 +170,82 @@ namespace TekygamiPlayer
             }
         }
 
+
+
+        private void LoadAlbumArt(string filePath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+                {
+                    AlbumArtImage.Source = null;
+                    return;
+                }
+                using (var file = TagLib.File.Create(filePath))
+                {
+                    var pictures = file.Tag.Pictures;
+                    if (pictures.Length > 0)
+                    {
+                        var bin = pictures[0].Data.Data;
+                        using (var ms = new MemoryStream(bin))
+                        {
+                            var image = new BitmapImage();
+                            image.BeginInit();
+                            image.CacheOption = BitmapCacheOption.OnLoad;
+                            image.StreamSource = ms;
+                            image.EndInit();
+                            image.Freeze();
+
+                            AlbumArtImage.Source = image;
+                            return;
+                        }
+                    }        
+                }
+                string directoryPath = System.IO.Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directoryPath))
+                {
+                    string[] possibleCoverDirs =
+                    {
+                        System.IO.Path.Combine(directoryPath, "Cover"),
+                        System.IO.Path.Combine(directoryPath, "covers"),
+                        System.IO.Path.Combine(directoryPath, "Artwork"),
+                        directoryPath
+                    };
+
+                    foreach(string dir in possibleCoverDirs)
+                    {
+                        if (System.IO.Directory.Exists(dir))
+                        {
+                            var imageFiles = System.IO.Directory.GetFiles(dir, "*.jpg")
+                            .Concat(System.IO.Directory.GetFiles(dir, "*.jpeg"))
+                            .Concat(System.IO.Directory.GetFiles(dir, "*.png"))
+                            .ToArray();
+                            if(imageFiles.Length > 0)
+                            {
+                                var image = new BitmapImage();
+                                image.BeginInit();
+                                image.UriSource = new Uri(imageFiles[0], UriKind.Absolute);
+                                image.CacheOption = BitmapCacheOption.OnLoad;
+                                image.EndInit();
+                                image.Freeze();
+
+                                AlbumArtImage.Source = image;
+                                return;
+                            }
+
+                        }
+                    }
+                     
+                }
+            }
+            catch (Exception)
+            {
+                AlbumArtImage.Source = null;
+            }
+        }
+
+
+
         private void BtnPause_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Pause();
@@ -177,5 +257,10 @@ namespace TekygamiPlayer
             currentlyPlayingPath = string.Empty;
         }
 
+        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            mediaPlayer.Volume = VolumeSlider.Value;
+        }
+      
     }
 }

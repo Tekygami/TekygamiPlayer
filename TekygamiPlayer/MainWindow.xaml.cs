@@ -20,12 +20,24 @@ namespace TekygamiPlayer
     public partial class MainWindow : Window
 
     {
+        private MediaPlayer mediaPlayer = new MediaPlayer();
+        private List<string> audioFilePaths = new List<string>();
+        private string selectedFilePath = string.Empty;
+        private string currentlyPlayingPath = string.Empty;
 
         public MainWindow()
 
         {
-
+           
             InitializeComponent();
+
+            LbPlayList.MouseDoubleClick += LbPlayList_MouseDoubleClick;
+            LbPlayList.SelectionChanged += LbPlayList_SelectionChanged;
+            BtnPlay.Click += BtnPlay_Click;
+            BtnPause.Click += BtnPause_Click;
+            BtnStop.Click += BtnStop_Click;
+
+          
 
         }
 
@@ -62,6 +74,7 @@ namespace TekygamiPlayer
                 //Чистим старый плейлист
 
                 LbPlayList.Items.Clear();
+                audioFilePaths.Clear();
 
 
 
@@ -100,6 +113,7 @@ namespace TekygamiPlayer
                 foreach (string file in allFiles)
 
                 {
+                    audioFilePaths.Add(file);
 
                     string fileName = System.IO.Path.GetFileName(file);
 
@@ -109,6 +123,58 @@ namespace TekygamiPlayer
 
             }
 
+        }
+
+        private void LbPlayList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int index = LbPlayList.SelectedIndex;
+            if (index >= 0 && index < audioFilePaths.Count)
+            {
+
+                selectedFilePath = audioFilePaths[index];
+                
+            }
+        }
+        private void LbPlayList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            int index = LbPlayList.SelectedIndex;
+            if (index >= 0 && index < audioFilePaths.Count)
+            {
+                string fullPath = audioFilePaths[index];
+                mediaPlayer.Open(new Uri(fullPath));
+                mediaPlayer.Play();
+            }
+        }
+
+
+
+        private void BtnPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(selectedFilePath)) return;
+
+         
+            if (selectedFilePath == currentlyPlayingPath)
+            {
+                mediaPlayer.Play();
+            }
+            else
+            {
+               
+                mediaPlayer.Open(new Uri(selectedFilePath));
+                mediaPlayer.Play();
+                currentlyPlayingPath = selectedFilePath;
+            }
+        }
+
+        private void BtnPause_Click(object sender, RoutedEventArgs e)
+        {
+            mediaPlayer.Pause();
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            mediaPlayer.Stop();
+            currentlyPlayingPath = string.Empty;
         }
 
     }

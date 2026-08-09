@@ -6,6 +6,20 @@
         xmlns:local="clr-namespace:TekygamiPlayer"
         mc:Ignorable="d"
         Title="TekygamiPlayer" Height="450" Width="800">
+    
+      <!-- Стили для всех кнопок -->
+
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#9c80f7"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+        </Style>
+    </Window.Resources>
+    
+    
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

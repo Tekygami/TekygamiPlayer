@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 namespace TekygamiPlayer
  
@@ -27,6 +28,7 @@ namespace TekygamiPlayer
         private List<string> audioFilePaths = new List<string>();
         private string selectedFilePath = string.Empty;
         private string currentlyPlayingPath = string.Empty;
+        private BitmapImage catGifSource;
 
         public MainWindow()
 
@@ -39,10 +41,15 @@ namespace TekygamiPlayer
             BtnPlay.Click += BtnPlay_Click;
             BtnPause.Click += BtnPause_Click;
             BtnStop.Click += BtnStop_Click;
+            BtnNext.Click += BtnNext_Click;
+            mediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
 
-          
+            catGifSource = new BitmapImage(new Uri("pack://application:,,,/Asset/Cat_HeadBang.gif"));
+            CatGifImage.Source = null;
 
         }
+
+        
 
         private void BtnSelectFolder_Click(Object sender, RoutedEventArgs e)
 
@@ -151,24 +158,11 @@ namespace TekygamiPlayer
         }
 
 
-
-        private void BtnPlay_Click(object sender, RoutedEventArgs e)
+        private void MediaPlayer_MediaEnded(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(selectedFilePath)) return;
-
-         
-            if (selectedFilePath == currentlyPlayingPath)
-            {
-                mediaPlayer.Play();
-            }
-            else
-            {
-               
-                mediaPlayer.Open(new Uri(selectedFilePath));
-                mediaPlayer.Play();
-                currentlyPlayingPath = selectedFilePath;
-            }
+            BtnNext_Click(null, null);
         }
+  
 
 
 
@@ -244,22 +238,60 @@ namespace TekygamiPlayer
             }
         }
 
+        private void BtnPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(selectedFilePath)) return;
 
+
+            if (selectedFilePath == currentlyPlayingPath)
+            {
+                mediaPlayer.Play();
+                CatGifImage.Source = catGifSource;
+            }
+            else
+            {
+
+                mediaPlayer.Open(new Uri(selectedFilePath));
+                mediaPlayer.Play();
+                currentlyPlayingPath = selectedFilePath;
+            }
+        }
 
         private void BtnPause_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Pause();
+            CatGifImage.Source = null;
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Stop();
+            CatGifImage.Source = null;
             currentlyPlayingPath = string.Empty;
         }
 
         private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             mediaPlayer.Volume = VolumeSlider.Value;
+        }
+
+        private void BtnNext_Click(object sender, RoutedEventArgs e)
+        {
+            int currentIndex = LbPlayList.SelectedIndex;
+
+            if (currentIndex == -1) currentIndex = 0;
+
+            if(currentIndex + 1 < audioFilePaths.Count)
+            {
+
+                LbPlayList.SelectedIndex = currentIndex + 1;
+
+                string nextPath = audioFilePaths[LbPlayList.SelectedIndex];
+                mediaPlayer.Open(new Uri(nextPath));
+                mediaPlayer.Play();
+                currentlyPlayingPath = nextPath;
+            }
+           
         }
       
     }

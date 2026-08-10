@@ -4,12 +4,12 @@ using System.Windows.Media.Imaging;
 using TagLib;
 using System.Windows;
 using System.Windows.Controls;
+using WpfAnimatedGif;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 namespace TekygamiPlayer
  
@@ -28,7 +28,6 @@ namespace TekygamiPlayer
         private List<string> audioFilePaths = new List<string>();
         private string selectedFilePath = string.Empty;
         private string currentlyPlayingPath = string.Empty;
-        private BitmapImage catGifSource;
 
         public MainWindow()
 
@@ -43,9 +42,7 @@ namespace TekygamiPlayer
             BtnStop.Click += BtnStop_Click;
             BtnNext.Click += BtnNext_Click;
             mediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
-
-            catGifSource = new BitmapImage(new Uri("pack://application:,,,/Asset/Cat_HeadBang.gif"));
-            CatGifImage.Source = null;
+            ImageBehavior.GetAnimationController(CatGifImage)?.Pause();
 
         }
 
@@ -75,7 +72,7 @@ namespace TekygamiPlayer
 
                 string folderPath = dialog.FolderName;
 
-                this.Title = folderPath;
+                this.Title = "TekygamiPlayer";
 
 
 
@@ -154,6 +151,9 @@ namespace TekygamiPlayer
                 string fullPath = audioFilePaths[index];
                 mediaPlayer.Open(new Uri(fullPath));
                 mediaPlayer.Play();
+
+                var controller = ImageBehavior.GetAnimationController(CatGifImage);
+                if (controller != null) controller.Play();
             }
         }
 
@@ -246,7 +246,6 @@ namespace TekygamiPlayer
             if (selectedFilePath == currentlyPlayingPath)
             {
                 mediaPlayer.Play();
-                CatGifImage.Source = catGifSource;
             }
             else
             {
@@ -255,19 +254,28 @@ namespace TekygamiPlayer
                 mediaPlayer.Play();
                 currentlyPlayingPath = selectedFilePath;
             }
+            var controller = ImageBehavior.GetAnimationController(CatGifImage);
+            if (controller != null) controller.Play();
         }
 
         private void BtnPause_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Pause();
-            CatGifImage.Source = null;
+
+            var controller = ImageBehavior.GetAnimationController(CatGifImage);
+            if (controller != null) controller.Pause();
         }
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Stop();
-            CatGifImage.Source = null;
-            currentlyPlayingPath = string.Empty;
+
+            var controller = ImageBehavior.GetAnimationController(CatGifImage);
+            if (controller != null)
+            {
+                controller.Pause();
+                controller.GotoFrame(0);
+            }
         }
 
         private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -290,6 +298,9 @@ namespace TekygamiPlayer
                 mediaPlayer.Open(new Uri(nextPath));
                 mediaPlayer.Play();
                 currentlyPlayingPath = nextPath;
+
+                var controller = ImageBehavior.GetAnimationController(CatGifImage);
+                if (controller != null) controller.Play();
             }
            
         }

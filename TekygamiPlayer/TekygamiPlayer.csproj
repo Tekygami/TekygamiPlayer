@@ -9,15 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Asset\Ava.ico" />
     <None Remove="Asset\Background1.png" />
     <None Remove="Asset\Cat_HeadBang.gif" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Asset\Ava.ico" />
     <Resource Include="Asset\Background1.png" />
     <Resource Include="Asset\Cat_HeadBang.gif" />
   </ItemGroup>

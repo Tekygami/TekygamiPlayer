@@ -28,12 +28,17 @@ namespace TekygamiPlayer
         private List<string> audioFilePaths = new List<string>();
         private string selectedFilePath = string.Empty;
         private string currentlyPlayingPath = string.Empty;
-
+        private System.Windows.Threading.DispatcherTimer timer;
+        private bool isDragging = false;
         public MainWindow()
 
         {
            
             InitializeComponent();
+
+            timer = new System.Windows.Threading.DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Tick += Timer_Tick;
 
             LbPlayList.MouseDoubleClick += LbPlayList_MouseDoubleClick;
             LbPlayList.SelectionChanged += LbPlayList_SelectionChanged;
@@ -42,11 +47,36 @@ namespace TekygamiPlayer
             BtnStop.Click += BtnStop_Click;
             BtnNext.Click += BtnNext_Click;
             mediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
-            ImageBehavior.GetAnimationController(CatGifImage)?.Pause();
+
+
+            ProgressSlider.AddHandler(UIElement.MouseLeftButtonDownEvent, new MouseButtonEventHandler(ProgressSlider_MouseLeftButtonDown), true);
+            ProgressSlider.AddHandler(UIElement.MouseLeftButtonUpEvent, new MouseButtonEventHandler(ProgressSlider_MouseLeftButtonUp), true);
+
 
         }
 
-        
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            if(!isDragging && mediaPlayer.Source != null && mediaPlayer.NaturalDuration.HasTimeSpan)
+            {
+                ProgressSlider.Maximum = mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds;
+                ProgressSlider.Value = mediaPlayer.Position.TotalSeconds;
+            }
+        }
+        private void ProgressSlider_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isDragging = true;
+        }
+        private void ProgressSlider_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            isDragging = false;
+            if(mediaPlayer.Source != null && mediaPlayer.NaturalDuration.HasTimeSpan)
+            {
+                mediaPlayer.Position = TimeSpan.FromSeconds(ProgressSlider.Value);
+            }
+        }
+
 
         private void BtnSelectFolder_Click(Object sender, RoutedEventArgs e)
 
@@ -55,50 +85,23 @@ namespace TekygamiPlayer
             var dialog = new Microsoft.Win32.OpenFolderDialog();
 
 
-
-            //Показываем окно выбора папки
-
             bool? result = dialog.ShowDialog();
-
-
-
 
 
             if (result == true)
 
             {
 
-                //Получаем путь к выбраной папке
-
                 string folderPath = dialog.FolderName;
 
                 this.Title = "TekygamiPlayer";
 
-
-
-
-
-                //Чистим старый плейлист
-
                 LbPlayList.Items.Clear();
                 audioFilePaths.Clear();
-
-
-
-
-
-
-
-                //Форматы мп3 и тд
 
                 string[] extensions = { "*.mp3", "*.wav", "*.flac", "*.aac", "*.ogg", "*.wma" };
 
                 var allFiles = new System.Collections.Generic.List<string>();
-
-
-
-                //Проходимся по форматам игем файлы во всех ПОДПАПКАХ
-
 
 
                 foreach (string ext in extensions)
@@ -110,12 +113,6 @@ namespace TekygamiPlayer
                     allFiles.AddRange(foundFiles);
 
                 }
-
-
-
-
-
-                //тут добавляем каждый трек в лист бокс на екране
 
                 foreach (string file in allFiles)
 
@@ -141,19 +138,6 @@ namespace TekygamiPlayer
 
                 selectedFilePath = audioFilePaths[index];
                 LoadAlbumArt(selectedFilePath);
-            }
-        }
-        private void LbPlayList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            int index = LbPlayList.SelectedIndex;
-            if (index >= 0 && index < audioFilePaths.Count)
-            {
-                string fullPath = audioFilePaths[index];
-                mediaPlayer.Open(new Uri(fullPath));
-                mediaPlayer.Play();
-
-                var controller = ImageBehavior.GetAnimationController(CatGifImage);
-                if (controller != null) controller.Play();
             }
         }
 
@@ -238,6 +222,22 @@ namespace TekygamiPlayer
             }
         }
 
+        private void LbPlayList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            int index = LbPlayList.SelectedIndex;
+            if (index >= 0 && index < audioFilePaths.Count)
+            {
+                string fullPath = audioFilePaths[index];
+                mediaPlayer.Open(new Uri(fullPath));
+                mediaPlayer.Play();
+                timer.Start();
+                ProgressSlider.IsEnabled = true;
+
+                var controller = ImageBehavior.GetAnimationController(CatGifImage);
+                if (controller != null) controller.Play();
+            }
+        }
+
         private void BtnPlay_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(selectedFilePath)) return;
@@ -246,6 +246,9 @@ namespace TekygamiPlayer
             if (selectedFilePath == currentlyPlayingPath)
             {
                 mediaPlayer.Play();
+                ProgressSlider.IsEnabled = true;
+                timer.Start();
+                
             }
             else
             {
@@ -261,6 +264,8 @@ namespace TekygamiPlayer
         private void BtnPause_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Pause();
+            ProgressSlider.IsEnabled = false;
+            timer.Stop();
 
             var controller = ImageBehavior.GetAnimationController(CatGifImage);
             if (controller != null) controller.Pause();
@@ -269,6 +274,9 @@ namespace TekygamiPlayer
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Stop();
+            timer.Stop();
+            ProgressSlider.IsEnabled = false;
+            ProgressSlider.Value = 0;
 
             var controller = ImageBehavior.GetAnimationController(CatGifImage);
             if (controller != null)
@@ -297,6 +305,8 @@ namespace TekygamiPlayer
                 string nextPath = audioFilePaths[LbPlayList.SelectedIndex];
                 mediaPlayer.Open(new Uri(nextPath));
                 mediaPlayer.Play();
+                timer.Start();
+                ProgressSlider.IsEnabled = true;
                 currentlyPlayingPath = nextPath;
 
                 var controller = ImageBehavior.GetAnimationController(CatGifImage);
@@ -304,6 +314,5 @@ namespace TekygamiPlayer
             }
            
         }
-      
     }
 }

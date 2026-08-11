@@ -22,6 +22,7 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
         </Style>
     </Window.Resources>
 
@@ -30,6 +31,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -42,7 +44,7 @@
                 <Button x:Name="BtnSelectFolder" Grid.Row="0" Grid.Column="0" Content="Select Music Folder" Height="30" Width="200" Margin="0" HorizontalAlignment="Left" Click="BtnSelectFolder_Click"/>
             <Slider x:Name="VolumeSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="0.5" HorizontalAlignment="Right" Margin="0" Width="100" ValueChanged="VolumeSlider_ValueChanged"/>
 
-            
+
         </Grid>
 
         <Grid Grid.Row="1">
@@ -74,11 +76,14 @@
             </Grid>
         </Grid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <Slider x:Name="ProgressSlider" Grid.Row="2" Minimum="0" Maximum="1" Value="0" Margin="5" IsEnabled="False"/>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="BtnPlay" Content="Play" Width="75" Height="30"  Margin="5"/>
             <Button x:Name="BtnPause" Content="Pause" Width="75" Height="30" Margin="5"/>
             <Button x:Name="BtnStop" Content="Stop" Width="75" Height="30" Margin="5"/>
             <Button x:Name="BtnNext" Content="Next" Width="75" Height="30" Margin="5"/>
         </StackPanel>
+
     </Grid>
 </Window>

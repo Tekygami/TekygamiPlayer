@@ -6,7 +6,7 @@
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         xmlns:local="clr-namespace:TekygamiPlayer"
         mc:Ignorable="d"
-        Title="TekygamiPlayer" Width="1024" Height="768" 
+        Title="TekygamiPlayer" Width="960" Height="760" 
         Icon="pack://application:,,,/TekygamiPlayer;component/Asset/Ava.ico">
 
 
@@ -14,7 +14,6 @@
         <ImageBrush ImageSource="/Asset/Background1.png" Stretch="UniformToFill"/>
     </Window.Background>
 
-    <!-- Стили для всех кнопок -->
 
     <Window.Resources>
         <Style TargetType="Button">
@@ -33,19 +32,25 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            </Grid.ColumnDefinitions>
 
-                <Button x:Name="BtnSelectFolder" Grid.Row="0" Grid.Column="0" Content="Select Music Folder" Height="30" Width="200" Margin="0" HorizontalAlignment="Left" Click="BtnSelectFolder_Click"/>
-            <Slider x:Name="VolumeSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="1" Value="0.5" HorizontalAlignment="Right" Margin="0" Width="100" ValueChanged="VolumeSlider_ValueChanged"/>
+            <Button x:Name="BtnSelectFolder" Grid.Row="0" Grid.Column="0" Content="Select Music Folder" Height="30" Width="200" Margin="0" HorizontalAlignment="Left" Click="BtnSelectFolder_Click"/>
 
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <TextBlock Text="Vol:" Foreground="Black" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <Slider x:Name="VolumeSlider" Minimum="0" Maximum="1" Value="0.5" HorizontalAlignment="Right" Margin="0" Width="100" ValueChanged="VolumeSlider_ValueChanged" Orientation="Horizontal"/>
+                <TextBlock x:Name="TxtVolumeValue" Text="50%" Foreground="Black" FontWeight="Bold" VerticalAlignment="Center" Margin="5,0,0,0" Width="35"/>
+            </StackPanel>
 
         </Grid>
+        
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -57,26 +62,34 @@
 
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
 
 
                 <ListBox x:Name="LbPlayList" Grid.Row="0"  Margin="5" Foreground="Black">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Foreground" Value="Black"/>
-                </Style>
-            </ListBox.ItemContainerStyle>
-        </ListBox>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Foreground" Value="Black"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
 
                 <Image x:Name="CatGifImage" Grid.Row="1" Width="200" Height="200" Margin="5" HorizontalAlignment="Center" Stretch="Uniform" gif:ImageBehavior.AnimatedSource="/Asset/Cat_HeadBang.gif" gif:ImageBehavior.AutoStart="False"/>
 
             </Grid>
         </Grid>
 
-        <Slider x:Name="ProgressSlider" Grid.Row="2" Minimum="0" Maximum="1" Value="0" Margin="5" IsEnabled="False"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+            <TextBlock x:Name="TxtCurrentTime" Text="00:00" Foreground="Black" FontWeight="Bold"/>
+            <TextBlock Text=" / " Foreground="Black" FontWeight="Bold" Margin="4,0"/>
+            <TextBlock x:Name="TxtTotalTime" Text="00:00" Foreground="Black" FontWeight="Bold"/>
+        </StackPanel>
+
+
+        <Slider x:Name="ProgressSlider" Grid.Row="2" Minimum="0" Maximum="1" Value="0" Margin="5,15,5,35" IsEnabled="False" Grid.RowSpan="2"/>
+
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="BtnPlay" Content="Play" Width="75" Height="30"  Margin="5"/>

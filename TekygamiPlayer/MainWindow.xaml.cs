@@ -60,8 +60,15 @@ namespace TekygamiPlayer
         {
             if(!isDragging && mediaPlayer.Source != null && mediaPlayer.NaturalDuration.HasTimeSpan)
             {
+                TimeSpan currentPosition = mediaPlayer.Position;
+                TimeSpan totalDuration = mediaPlayer.NaturalDuration.TimeSpan;
+
                 ProgressSlider.Maximum = mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds;
                 ProgressSlider.Value = mediaPlayer.Position.TotalSeconds;
+
+                TxtCurrentTime.Text = currentPosition.ToString(@"mm\:ss");
+                TxtTotalTime.Text = totalDuration.ToString(@"mm\:ss");
+             
             }
         }
         private void ProgressSlider_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -255,6 +262,8 @@ namespace TekygamiPlayer
 
                 mediaPlayer.Open(new Uri(selectedFilePath));
                 mediaPlayer.Play();
+                ProgressSlider.IsEnabled = true;
+                timer.Start();
                 currentlyPlayingPath = selectedFilePath;
             }
             var controller = ImageBehavior.GetAnimationController(CatGifImage);
@@ -264,7 +273,6 @@ namespace TekygamiPlayer
         private void BtnPause_Click(object sender, RoutedEventArgs e)
         {
             mediaPlayer.Pause();
-            ProgressSlider.IsEnabled = false;
             timer.Stop();
 
             var controller = ImageBehavior.GetAnimationController(CatGifImage);
@@ -277,6 +285,8 @@ namespace TekygamiPlayer
             timer.Stop();
             ProgressSlider.IsEnabled = false;
             ProgressSlider.Value = 0;
+            TxtCurrentTime.Text = "00:00";
+            TxtTotalTime.Text = "00:00";
 
             var controller = ImageBehavior.GetAnimationController(CatGifImage);
             if (controller != null)
@@ -289,6 +299,11 @@ namespace TekygamiPlayer
         private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             mediaPlayer.Volume = VolumeSlider.Value;
+            if(TxtVolumeValue != null)
+            {
+                int volPercent = (int)(VolumeSlider.Value * 100);
+                TxtVolumeValue.Text = $"{volPercent}%";
+            }
         }
 
         private void BtnNext_Click(object sender, RoutedEventArgs e)
